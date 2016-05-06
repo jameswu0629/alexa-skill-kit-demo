@@ -1,0 +1,12 @@
+{
+    "dependencies": {
+        "express": "4.13.3",
+        "fs": "0.0.2",
+        "mqtt": "1.6.0",
+        "aws-sdk": "2.2.21"
+    },
+    "description": "alexa to iot",
+    "name": "alexa-iot",
+    "private": true,
+    "version": "0.0.1"
+}
