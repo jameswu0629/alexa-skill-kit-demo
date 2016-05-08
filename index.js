@@ -30,70 +30,40 @@ exports.handler = function (event, context) {
 
         var repromptText = "";
         var speechOutput = "";
+
+	var botStatusValue = -1;
         
         switch(intentName) 
-        {   
-            case "MoveSpiderIntent":        
-            var botStatusValue		= -1;
-            var spiderStatusSlot	= intent.slots.SpiderStatus;
-            var currentSpiderStatus	= spiderStatusSlot.value;
+        {
+	    case "MoveStraightSpiderIntent":
+
+	    botStatusValue = 1;
+            speechOutput   = "Ok, spider will go straight.";
 	    
-            switch(currentSpiderStatus) {
-            case "straight":
-                botStatusValue = 1;
-                break;
-	        
-            case "back":
-                botStatusValue = 2;
-                break;
-	        
-            default:
-                break;
-            }
+	    break;
+
+	    case "MoveBackSpiderIntent":
+	    
+	    botStatusValue = 2;
+            speechOutput   = "Ok, spider will move back.";
             
-            speechOutput = "Ok, spider will go " + currentSpiderStatus;
-            repromptText = "";
-            
-            //--- update IoT
-            var client = mqtt.connect(options);
-            client.on('connect', function (err) {
-                client.publish(topic, "{ \"state\": {\"desired\": {\"botStatusValue\": "+ botStatusValue +" } } }");
-                client.end();
-                context.succeed(buildResponse(sessionAttributes,
-					      buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession)));
-            });
-            
-            break;
+	    break;
 
             case "SitdownSpiderIntent":
-            speechOutput = "Ok, spider will sit down";
-            repromptText = "";
 
-	    shouldEndSession = true;
+	    botStatusValue = 7;
+            speechOutput   = "Ok, spider will sit down";
+
+	    // session end in sitdown action
+	    shouldEndSession = true; 
             
-            //--- update IoT
-            var client = mqtt.connect(options);
-            client.on('connect', function (err) {
-                client.publish(topic, "{ \"state\": {\"desired\": {\"botStatusValue\": 7 } } }");
-                client.end();
-                context.succeed(buildResponse(sessionAttributes,
-	        			      buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession)));
-            });
-            //---
             break;
 	    
             case "StandupSpiderIntent":
-            speechOutput = "Ok, spider will stand up.";
-            repromptText = "";
+
+	    botStatusValue = 6;
+            speechOutput   = "Ok, spider will stand up.";
             
-            //--- update IoT
-            var client = mqtt.connect(options);
-            client.on('connect', function (err) {
-                client.publish(topic, "{ \"state\": {\"desired\": {\"botStatusValue\": 6 } } }");
-                client.end();
-                context.succeed(buildResponse(sessionAttributes,
-	        			      buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession)));
-            });
             break;
             
             
@@ -101,6 +71,15 @@ exports.handler = function (event, context) {
             throw "Invalid intent";
             break;
         }
+
+	//--- update IoT
+        var client = mqtt.connect(options);
+        client.on('connect', function (err) {
+            client.publish(topic, "{ \"state\": {\"desired\": {\"botStatusValue\": "+ botStatusValue +" } } }");
+            client.end();
+            context.succeed(buildResponse(sessionAttributes,
+	        			  buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession)));
+        });
 
     } catch (e) {
         context.fail("Exception: " + e);
