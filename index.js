@@ -118,7 +118,7 @@ function getWelcomeResponse(callback) {
         "stand up, sit down, go straight or go back.";
     
 
-    var repromptText     = "Please tell me your command by saying, stand up, sit down, go straight or go back.";
+    var repromptText     = "Please tell me your command by saying, stand up, sit down, go straight or move back.";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
